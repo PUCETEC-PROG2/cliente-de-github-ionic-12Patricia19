@@ -1,0 +1,19 @@
+.form-buttons {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+ion-list {
+  padding-bottom: 16px;
+}
+
+ion-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+}
+
+ion-label[position="stacked"] {
+  margin-bottom: 8px;
+}

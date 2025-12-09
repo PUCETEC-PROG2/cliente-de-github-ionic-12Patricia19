@@ -1,0 +1,91 @@
+.profile-container {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.profile-header {
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border: 4px solid var(--ion-color-primary);
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.profile-username {
+  color: var(--ion-color-medium);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.profile-bio {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--ion-color-step-600);
+  line-height: 1.5;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ion-color-step-150);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.stat-item ion-icon {
+  font-size: 24px;
+  color: var(--ion-color-primary);
+}
+
+.stat-item div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-item strong {
+  font-size: 1.25rem;
+  color: var(--ion-color-dark);
+}
+
+.stat-item span {
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+.profile-actions {
+  margin-top: 16px;
+}
+
+ion-item a {
+  color: var(--ion-color-primary);
+  text-decoration: none;
+}
+
+ion-item a:hover {
+  text-decoration: underline;
+}

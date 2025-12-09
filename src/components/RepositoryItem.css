@@ -1,0 +1,21 @@
+.repository-details {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+  flex-wrap: wrap;
+}
+
+.repository-language,
+.repository-stars,
+.repository-updated {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.repository-language ion-icon,
+.repository-stars ion-icon {
+  font-size: 14px;
+}
