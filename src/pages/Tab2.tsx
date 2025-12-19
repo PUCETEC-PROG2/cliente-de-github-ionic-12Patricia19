@@ -14,10 +14,12 @@ import {
   IonSelect,
   IonSelectOption,
   IonIcon,
-  IonToast
+  IonToast,
+  IonSpinner
 } from '@ionic/react';
 import { useState } from 'react';
 import { gitBranch, checkmarkCircle } from 'ionicons/icons';
+import { createRepository, CreateRepositoryData } from '../services/githubService';
 import './Tab2.css';
 
 const Tab2: React.FC = () => {
@@ -29,25 +31,59 @@ const Tab2: React.FC = () => {
   const [license, setLicense] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastColor, setToastColor] = useState<'success' | 'danger'>('success');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!repoName.trim()) {
       setToastMessage('Por favor ingresa un nombre para el repositorio');
+      setToastColor('danger');
       setShowToast(true);
       return;
     }
 
-    setToastMessage(`Repositorio "${repoName}" creado exitosamente!`);
-    setShowToast(true);
+    try {
+      setLoading(true);
+      
+      const repoData: CreateRepositoryData = {
+        name: repoName.trim(),
+        private: isPrivate,
+        auto_init: autoInit
+      };
 
-    setRepoName('');
-    setDescription('');
-    setIsPrivate(false);
-    setAutoInit(true);
-    setGitignoreTemplate('');
-    setLicense('');
+      if (description.trim()) {
+        repoData.description = description.trim();
+      }
+
+      if (gitignoreTemplate) {
+        repoData.gitignore_template = gitignoreTemplate;
+      }
+
+      if (license) {
+        repoData.license_template = license;
+      }
+
+      await createRepository(repoData);
+
+      setToastMessage(`Repositorio "${repoName}" creado exitosamente!`);
+      setToastColor('success');
+      setShowToast(true);
+
+      setRepoName('');
+      setDescription('');
+      setIsPrivate(false);
+      setAutoInit(true);
+      setGitignoreTemplate('');
+      setLicense('');
+    } catch (err: any) {
+      setToastMessage(err.response?.data?.message || 'Error al crear el repositorio');
+      setToastColor('danger');
+      setShowToast(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -149,11 +185,17 @@ const Tab2: React.FC = () => {
           </IonList>
 
           <div className="form-buttons">
-            <IonButton expand="block" type="submit" color="primary">
-              <IonIcon slot="start" icon={gitBranch} />
-              Crear Repositorio
+            <IonButton expand="block" type="submit" color="primary" disabled={loading}>
+              {loading ? (
+                <IonSpinner name="crescent" />
+              ) : (
+                <>
+                  <IonIcon slot="start" icon={gitBranch} />
+                  Crear Repositorio
+                </>
+              )}
             </IonButton>
-            <IonButton expand="block" type="button" color="medium" fill="outline" onClick={handleReset}>
+            <IonButton expand="block" type="button" color="medium" fill="outline" onClick={handleReset} disabled={loading}>
               Limpiar Formulario
             </IonButton>
           </div>
@@ -166,7 +208,7 @@ const Tab2: React.FC = () => {
           duration={3000}
           icon={checkmarkCircle}
           position="top"
-          color={toastMessage.includes('exitosamente') ? 'success' : 'warning'}
+          color={toastColor}
         />
       </IonContent>
     </IonPage>
