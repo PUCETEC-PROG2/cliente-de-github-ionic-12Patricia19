@@ -1,8 +1,8 @@
-import { 
-  IonContent, 
-  IonHeader, 
-  IonPage, 
-  IonTitle, 
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
   IonToolbar,
   IonList,
   IonItem,
@@ -20,6 +20,7 @@ import {
 import { useState } from 'react';
 import { gitBranch, checkmarkCircle } from 'ionicons/icons';
 import { createRepository, CreateRepositoryData } from '../services/githubService';
+import { useRepository } from '../context/RepositoryContext';
 import './Tab2.css';
 
 const Tab2: React.FC = () => {
@@ -33,10 +34,11 @@ const Tab2: React.FC = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastColor, setToastColor] = useState<'success' | 'danger'>('success');
   const [loading, setLoading] = useState(false);
+  const { triggerRefresh } = useRepository();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!repoName.trim()) {
       setToastMessage('Por favor ingresa un nombre para el repositorio');
       setToastColor('danger');
@@ -46,7 +48,7 @@ const Tab2: React.FC = () => {
 
     try {
       setLoading(true);
-      
+
       const repoData: CreateRepositoryData = {
         name: repoName.trim(),
         private: isPrivate,
@@ -70,6 +72,8 @@ const Tab2: React.FC = () => {
       setToastMessage(`Repositorio "${repoName}" creado exitosamente!`);
       setToastColor('success');
       setShowToast(true);
+      triggerRefresh();
+
 
       setRepoName('');
       setDescription('');

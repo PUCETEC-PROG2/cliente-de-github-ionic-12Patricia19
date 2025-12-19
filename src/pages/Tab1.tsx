@@ -15,6 +15,7 @@ import {
 import { useState, useEffect } from 'react';
 import RepositoryItem from '../components/RepositoryItem';
 import { getRepositories, Repository } from '../services/githubService';
+import { useRepository } from '../context/RepositoryContext';
 import './Tab1.css';
 
 const Tab1: React.FC = () => {
@@ -22,6 +23,7 @@ const Tab1: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { shouldRefresh, resetRefresh } = useRepository();
 
   const fetchRepositories = async () => {
     try {
@@ -39,6 +41,13 @@ const Tab1: React.FC = () => {
   useEffect(() => {
     fetchRepositories();
   }, []);
+
+  useEffect(() => {
+    if (shouldRefresh) {
+      fetchRepositories();
+      resetRefresh();
+    }
+  }, [shouldRefresh, resetRefresh]);
 
   const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
     await fetchRepositories();
