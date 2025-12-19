@@ -8,69 +8,41 @@ import {
   IonRefresher,
   IonRefresherContent,
   RefresherEventDetail,
-  IonSearchbar
+  IonSearchbar,
+  IonSpinner,
+  IonText
 } from '@ionic/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import RepositoryItem from '../components/RepositoryItem';
+import { getRepositories, Repository } from '../services/githubService';
 import './Tab1.css';
 
-const mockRepositories = [
-  {
-    id: 1,
-    name: 'cliente-de-github-ionic',
-    description: 'Aplicación móvil cliente de GitHub desarrollada con Ionic y React',
-    stars: 15,
-    language: 'TypeScript',
-    isPrivate: false,
-    updatedAt: '2024-12-08T10:30:00Z'
-  },
-  {
-    id: 2,
-    name: 'proyecto-react-native',
-    description: 'Proyecto de aplicación móvil con React Native',
-    stars: 8,
-    language: 'JavaScript',
-    isPrivate: false,
-    updatedAt: '2024-12-05T14:20:00Z'
-  },
-  {
-    id: 3,
-    name: 'api-rest-nodejs',
-    description: 'API REST desarrollada con Node.js y Express',
-    stars: 23,
-    language: 'JavaScript',
-    isPrivate: true,
-    updatedAt: '2024-12-07T09:15:00Z'
-  },
-  {
-    id: 4,
-    name: 'web-portfolio',
-    description: 'Portfolio personal desarrollado con React',
-    stars: 5,
-    language: 'TypeScript',
-    isPrivate: false,
-    updatedAt: '2024-11-28T16:45:00Z'
-  },
-  {
-    id: 5,
-    name: 'python-data-analysis',
-    description: 'Proyecto de análisis de datos con Python y Pandas',
-    stars: 12,
-    language: 'Python',
-    isPrivate: false,
-    updatedAt: '2024-12-01T11:00:00Z'
-  }
-];
-
 const Tab1: React.FC = () => {
-  const [repositories, setRepositories] = useState(mockRepositories);
+  const [repositories, setRepositories] = useState<Repository[]>([]);
   const [searchText, setSearchText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleRefresh = (event: CustomEvent<RefresherEventDetail>) => {
-    setTimeout(() => {
-      setRepositories([...mockRepositories]);
-      event.detail.complete();
-    }, 1000);
+  const fetchRepositories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const repos = await getRepositories();
+      setRepositories(repos);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Error al cargar los repositorios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRepositories();
+  }, []);
+
+  const handleRefresh = async (event: CustomEvent<RefresherEventDetail>) => {
+    await fetchRepositories();
+    event.detail.complete();
   };
 
   const filteredRepositories = repositories.filter(repo =>
@@ -104,19 +76,35 @@ const Tab1: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-        <IonList>
-          {filteredRepositories.map((repo) => (
-            <RepositoryItem
-              key={repo.id}
-              name={repo.name}
-              description={repo.description}
-              stars={repo.stars}
-              language={repo.language}
-              isPrivate={repo.isPrivate}
-              updatedAt={repo.updatedAt}
-            />
-          ))}
-        </IonList>
+        {loading && (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+            <IonSpinner name="crescent" />
+          </div>
+        )}
+
+        {error && (
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            <IonText color="danger">
+              <p>{error}</p>
+            </IonText>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <IonList>
+            {filteredRepositories.map((repo) => (
+              <RepositoryItem
+                key={repo.id}
+                name={repo.name}
+                description={repo.description || undefined}
+                stars={repo.stargazers_count}
+                language={repo.language || undefined}
+                isPrivate={repo.private}
+                updatedAt={repo.updated_at}
+              />
+            ))}
+          </IonList>
+        )}
       </IonContent>
     </IonPage>
   );
