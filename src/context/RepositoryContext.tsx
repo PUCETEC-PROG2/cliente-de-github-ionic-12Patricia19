@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Repository } from '../services/githubService';
 
 interface RepositoryContextType {
+  repositories: Repository[];
+  setRepositories: React.Dispatch<React.SetStateAction<Repository[]>>;
   shouldRefresh: boolean;
   triggerRefresh: () => void;
   resetRefresh: () => void;
@@ -9,6 +12,7 @@ interface RepositoryContextType {
 const RepositoryContext = createContext<RepositoryContextType | undefined>(undefined);
 
 export const RepositoryProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [repositories, setRepositories] = useState<Repository[]>([]);
   const [shouldRefresh, setShouldRefresh] = useState(false);
 
   const triggerRefresh = () => {
@@ -20,7 +24,7 @@ export const RepositoryProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   return (
-    <RepositoryContext.Provider value={{ shouldRefresh, triggerRefresh, resetRefresh }}>
+    <RepositoryContext.Provider value={{ repositories, setRepositories, shouldRefresh, triggerRefresh, resetRefresh }}>
       {children}
     </RepositoryContext.Provider>
   );

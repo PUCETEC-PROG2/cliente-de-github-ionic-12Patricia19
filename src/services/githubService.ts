@@ -49,6 +49,12 @@ export interface CreateRepositoryData {
   license_template?: string;
 }
 
+export interface UpdateRepositoryData {
+  name?: string;
+  description?: string;
+  private?: boolean;
+}
+
 export const getRepositories = async (): Promise<Repository[]> => {
   const response = await githubApi.get<Repository[]>('/user/repos', {
     params: {
@@ -66,5 +72,14 @@ export const getUserInfo = async (): Promise<User> => {
 
 export const createRepository = async (data: CreateRepositoryData): Promise<Repository> => {
   const response = await githubApi.post<Repository>('/user/repos', data);
+  return response.data;
+};
+
+export const deleteRepository = async (owner: string, repo: string): Promise<void> => {
+  await githubApi.delete(`/repos/${owner}/${repo}`);
+};
+
+export const updateRepository = async (owner: string, repo: string, data: UpdateRepositoryData): Promise<Repository> => {
+  const response = await githubApi.patch<Repository>(`/repos/${owner}/${repo}`, data);
   return response.data;
 };
